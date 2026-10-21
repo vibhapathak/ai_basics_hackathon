@@ -1,0 +1,17 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>FlowMine: find the loop in your busywork</title><link rel="stylesheet" href="style.css"></head>
+<body>
+<header><h1>FlowMine</h1><p>Paste a log of repetitive work. See the loop hiding inside it, then get a script that does it for you.</p></header>
+<main>
+<section class="panel in"><label for="log">Activity log</label>
+<textarea id="log" spellcheck="false" placeholder="Paste one action per line, for example:&#10;09:03 open report_jan.xlsx&#10;09:04 save summary_jan.pdf"></textarea>
+<div class="row"><button id="mine" class="primary">Find the loop</button><button id="sample">Load sample</button></div>
+<p id="stats" class="stats" aria-live="polite"></p></section>
+<section class="panel flow"><div class="bar"><h2>Detected workflow</h2><button id="run" class="primary" disabled>Run it</button></div>
+<div id="chart"><p class="empty">Load the sample log or paste your own, then choose Find the loop.</p></div></section>
+<aside class="side">
+<section class="panel"><h2>Step details</h2><div id="inspect" class="muted">Select a step in the chart.</div></section>
+<section class="panel"><div class="bar"><h2>Generated script</h2><span><button id="copy">Copy</button> <button id="dl">Download</button></span></div><pre id="code" class="code"></pre></section>
+<section class="panel"><h2>Run output</h2><pre id="out" class="code small" aria-live="polite"></pre></section>
+</aside></main><script src="app.js"></script></body></html>
