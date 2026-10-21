@@ -1,5 +1,6 @@
 const $=id=>document.getElementById(id);
-const SAMPLE=`09:00 open portal.example.com
+const DOMAINS = {
+  'Monthly Report': `09:00 open portal.example.com
 09:01 login as ops_team
 09:03 open report_jan.xlsx
 09:03 copy range A1:D20
@@ -17,7 +18,26 @@ const SAMPLE=`09:00 open portal.example.com
 09:18 copy range A1:D20
 09:19 paste into summary_apr.xlsx
 09:19 save summary_apr.pdf
-09:25 email summary pack to finance@acme.com`;
+09:25 email summary pack to finance@acme.com`,
+  'Support Tickets': `10:00 open dashboard.internal
+10:01 search for ticket 12345
+10:02 review ticket 12345 details
+10:03 update ticket 12345 status to 'pending_info'
+10:04 send email to user for ticket 12345 from template_A.txt
+10:08 search for ticket 12346
+10:09 review ticket 12346 details
+10:10 update ticket 12346 status to 'pending_info'
+10:11 send email to user for ticket 12346 from template_B.txt
+10:15 search for ticket 12347
+10:16 review ticket 12347 details
+10:17 update ticket 12347 status to 'pending_info'
+10:18 send email to user for ticket 12347 from template_A.txt
+10:22 search for ticket 12348
+10:23 review ticket 12348 details
+10:24 update ticket 12348 status to 'pending_info'
+10:25 send email to user for ticket 12348 from template_B.txt
+10:30 log out`
+};
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const clean=l=>l.replace(/^\s*\[?\d{1,2}:\d{2}(:\d{2})?\]?\s*[-–]?\s*/,'').trim();
 const tpl=s=>s.replace(/[\w-]+\.\w{2,4}\b/g,'{file}').replace(/\b[A-Z]\d+(:[A-Z]\d+)?\b/g,'{range}').replace(/\d+/g,'{n}');

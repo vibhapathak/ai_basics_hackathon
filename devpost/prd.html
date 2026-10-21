@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FlowMine PRD Review</title>
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({ startOnLoad: true, theme: 'neutral' });
+    </script>
+    <style>
+        :root {
+            --navy: #001f3f;
+            --violet: #7f00ff;
+            --amber: #ffbf00;
+            --green: #2ecc40;
+            --light-grey: #f4f4f4;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2rem;
+            background-color: var(--light-grey);
+        }
+        .container {
+            background: white;
+            padding: 3rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        h1, h2, h3 {
+            color: var(--navy);
+        }
+        h1 { border-bottom: 2px solid var(--violet); padding-bottom: 0.5rem; }
+        .mermaid { margin: 2rem 0; background: white; padding: 1rem; border-radius: 4px; }
+        .section { margin-bottom: 3rem; }
+        .card {
+            border-left: 4px solid var(--violet);
+            background: #f9f9f9;
+            padding: 1rem 1.5rem;
+            margin: 1rem 0;
+        }
+        .criteria-list { list-style: none; padding-left: 0; }
+        .criteria-list li::before {
+            content: "✓";
+            color: var(--green);
+            font-weight: bold;
+            margin-right: 0.5rem;
+        }
+        .decision-badge {
+            display: inline-block;
+            background: var(--navy);
+            color: white;
+            padding: 0.2rem 0.6rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            margin-bottom: 0.5rem;
+        }
+        .mono { font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; background: #eee; padding: 0.1rem 0.3rem; border-radius: 3px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>FlowMine — Product Requirements</h1>
+        <p><em>Find and collapse repetitive activity logs into interactive automation flowcharts.</em></p>
+
+        <div class="section">
+            <h2>The Core Journey</h2>
+            <div class="mermaid">
+                graph TD
+                    A[Arrival: Monthly Log Loaded] --> B[Toggle: Switch to Support Tickets]
+                    B --> C[Action: Find the Loop]
+                    C --> D{Animation: 2.5s Collapse}
+                    D --> E[Land: ×4 Badge & Script Reveal]
+                    E --> F[Action: Run Simulation]
+                    F --> G[Progress: Pulsing & Ticking]
+                    G --> H[Success: Green State & Done]
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Key Behaviors & Success Criteria</h2>
+            
+            <div class="card">
+                <h3>1. The Collapse Animation</h3>
+                <p>Visualizes the transformation from "mess" to "order."</p>
+                <ul class="criteria-list">
+                    <li>Highlight repeating lines in violet (0.4s).</li>
+                    <li>Stack repeat groups vertically (0.6s).</li>
+                    <li>Fold stack into a flowchart node (0.6s).</li>
+                    <li>Pop "×4" badge with a bounce (0.3s).</li>
+                    <li>Total sequence matches 2.5s timing.</li>
+                </ul>
+            </div>
+
+            <div class="card">
+                <h3>2. Interactive Run Simulation</h3>
+                <p>Proves the automation works through visual feedback.</p>
+                <ul class="criteria-list">
+                    <li>Active step glows violet with thick outline.</li>
+                    <li>Badge ticks progress (e.g., 1/4, 2/4) during loops.</li>
+                    <li>Completed steps turn green.</li>
+                    <li>Output panel prints actions (e.g., "-> open report_feb.xlsx").</li>
+                </ul>
+            </div>
+
+            <div class="card">
+                <h3>3. Look & Feel</h3>
+                <ul class="criteria-list">
+                    <li>Navy/Violet palette for primary UI/State.</li>
+                    <li>Amber for variable data; Green for success.</li>
+                    <li>Monospace for <span class="mono">log lines</span> and <span class="mono">script</span>.</li>
+                    <li>Light-grey grid background.</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Product Decisions</h2>
+            <div>
+                <span class="decision-badge">Warm Start</span>
+                <p>Pre-loading the "Monthly report" log ensures the first interaction is meaningful and demo-ready.</p>
+            </div>
+            <div>
+                <span class="decision-badge">Fade-in Script</span>
+                <p>The script appears instantly after animation to keep the eye moving toward the "Run" action without typing delays.</p>
+            </div>
+            <div>
+                <span class="decision-badge">Intentional Timing</span>
+                <p>2.5s for the animation is the "Goldilocks" zone—satisfyingly detailed but fast enough for a 60-second demo.</p>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>States & Edge Cases</h2>
+            <div class="card">
+                <strong>Empty Log:</strong> "The log is empty. Paste one action per line..."
+            </div>
+            <div class="card">
+                <strong>No Loop Found:</strong> "No repeated sequence found. FlowMine needs a group..."
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Next Steps</h2>
+            <p>Review the full document in <span class="mono">devpost/prd.md</span>. If this looks good, we'll move to <strong>4-spec</strong> to define the technical implementation.</p>
+        </div>
+    </div>
+</body>
+</html>
