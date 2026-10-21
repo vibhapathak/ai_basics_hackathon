@@ -111,6 +111,16 @@ async function run(){
   $('badge').textContent=`×${m.k}`;log('Done.');running=false;$('run').disabled=false}
 
 $('mine').onclick=mine;$('run').onclick=run;
-$('sample').onclick=()=>{$('log').value=SAMPLE;mine()};
+const EMPTY='<p class="empty">Choose Find the loop to see the pattern.</p>';
+const currentDomain=()=>document.querySelector('input[name=domain]:checked').value;
+function reset(){
+  model=null;
+  $('chart').innerHTML=EMPTY;$('code').textContent='';$('out').textContent='';
+  $('stats').textContent='';$('inspect').innerHTML='';$('run').disabled=true}
+function loadDomain(){$('log').value=DOMAINS[currentDomain()];reset()}
+document.querySelectorAll('input[name=domain]').forEach(r=>r.onchange=loadDomain);
+$('load-sample').onclick=loadDomain;
+$('clear-log').onclick=()=>{$('log').value='';reset()};
+loadDomain();
 $('copy').onclick=async()=>{try{await navigator.clipboard.writeText($('code').textContent);$('copy').textContent='Copied'}catch(e){$('copy').textContent='Copy failed'}setTimeout(()=>$('copy').textContent='Copy',1500)};
 $('dl').onclick=()=>{if(!$('code').textContent)return;const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([$('code').textContent],{type:'text/x-python'}));a.download='flowmine_automation.py';a.click()};
