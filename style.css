@@ -26,3 +26,29 @@ button.primary{background:var(--loop);border-color:var(--loop);color:#fff}
 #inspect code{font:13px ui-monospace,Menlo,monospace;background:#f1f3fb;padding:1px 5px;border-radius:4px}
 @media(max-width:1100px){main{grid-template-columns:1fr}}
 @media(prefers-reduced-motion:reduce){*{transition:none!important}}
+#log-viewer{height:320px;max-height:none;background:#fafbfe;color:var(--ink);border:1px solid var(--line);cursor:text;font-size:13px}
+.log-line{padding:0 6px;border-radius:4px;transition:background .4s}
+.log-line.hl{background:rgba(91,61,245,.16)}
+.badge{transform-box:fill-box;transform-origin:center}
+.panel{box-shadow:0 8px 24px -14px rgba(27,35,64,.25)}
+h1{background:linear-gradient(90deg,var(--ink) 55%,var(--loop));-webkit-background-clip:text;background-clip:text;color:transparent}
+button{transition:border-color .15s,transform .1s}button:active:not(:disabled){transform:translateY(1px)}
+.node:hover rect{stroke:var(--loop)}
+.empty{border:2px dashed var(--line);border-radius:12px;margin:8px}
+.saved{margin-top:12px;padding:10px 12px;background:#eaf7f1;border:1px solid var(--ok);border-radius:8px;color:var(--ink);font-size:14px}
+.saved b{color:var(--ok)}
+
+.steps{display:flex;flex-wrap:wrap;gap:8px;list-style:none;padding:0;margin:16px 0 0;counter-reset:s}
+.steps li{counter-increment:s;display:flex;gap:8px;align-items:center;padding:5px 14px 5px 6px;font-size:13px;font-weight:600;color:var(--mut);background:#fff;border:1px solid var(--line);border-radius:999px;transition:all .25s}
+.steps li::before{content:counter(s);display:grid;place-items:center;width:20px;height:20px;border-radius:50%;background:var(--line);color:#fff;font-size:12px;transition:background .25s}
+/* done */
+body:is([data-state=ANIMATING],[data-state=READY],[data-state=RUNNING],[data-state=DONE]) .steps li:nth-child(1)::before,
+body:is([data-state=RUNNING],[data-state=DONE]) .steps li:nth-child(2)::before,
+body[data-state=DONE] .steps li:nth-child(3)::before{background:var(--ok)}
+/* active */
+body[data-state=IDLE] .steps li:nth-child(1),
+body:is([data-state=ANIMATING],[data-state=READY]) .steps li:nth-child(2),
+body[data-state=RUNNING] .steps li:nth-child(3){color:var(--ink);border-color:var(--loop)}
+body[data-state=IDLE] .steps li:nth-child(1)::before,
+body:is([data-state=ANIMATING],[data-state=READY]) .steps li:nth-child(2)::before,
+body[data-state=RUNNING] .steps li:nth-child(3)::before{background:var(--loop)}
