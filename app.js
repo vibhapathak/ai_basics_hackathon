@@ -62,8 +62,16 @@ function gen(m){const q=JSON.stringify;
   m.body.forEach((st,j)=>o+=st.varies?`    do(VALUES_${j+1}[i])\n`:`    do(${q(st.vals[0])})\n`);
   o+='\n';m.post.forEach(s=>o+=`do(${q(s)})\n`);return o}
 
-let model=null,nodes=[],running=false;
+const State = { IDLE: 'IDLE', ANIMATING: 'ANIMATING', READY: 'READY', RUNNING: 'RUNNING', DONE: 'DONE' };
+let appState = State.IDLE, model = null, nodes = [], runId = 0, activeAnims = [];
 const W=520,X=110,NW=300,NH=50,G=34;
+
+function cleanup() {
+  runId++;
+  activeAnims.forEach(a => a.cancel && a.cancel());
+  activeAnims = [];
+  document.querySelectorAll('.node').forEach(e => e.classList.remove('on', 'done', 'sel'));
+}
 
 function render(m){
   nodes=[...m.pre.map(t=>({t,kind:'pre'})),...m.body.map((b,j)=>({t:b.label,kind:'loop',b,j})),...m.post.map(t=>({t,kind:'post'}))];
@@ -86,40 +94,82 @@ function pick(i){
   else h=`<p>Runs once, ${n.kind==='pre'?'before':'after'} the loop.</p><p><code>${esc(n.t)}</code></p>`;
   $('inspect').innerHTML=h}
 
-function mine(){
+async function mine(){
+  cleanup();
   const text=$('log').value.trim();
-  if(!text){$('chart').innerHTML='<p class="empty">The log is empty. Paste one action per line, or choose Load sample.</p>';return}
+  if(!text){
+    appState = State.IDLE;
+    $('chart').innerHTML='<p class="empty">The log is empty. Paste one action per line, or choose Load sample.</p>';
+    return;
+  }
   model=build(text);$('run').disabled=true;$('code').textContent='';$('out').textContent='';
-  if(!model.k){$('chart').innerHTML='<p class="empty">No repeated sequence found. FlowMine needs a group of steps that appears at least twice in a row. Add more of the log and try again.</p>';$('stats').textContent='';return}
+  if(!model.k){
+    appState = State.IDLE;
+    $('chart').innerHTML='<p class="empty">No repeated sequence found. FlowMine needs a group of steps that appears at least twice in a row. Add more of the log and try again.</p>';
+    $('stats').textContent='';
+    return;
+  }
+
+  appState = State.ANIMATING;
+  $('log').style.display = 'none';
+  $('log-viewer').style.display = 'block';
+  $('log-viewer').textContent = text;
+  $('chart').innerHTML = '<div class="empty">Finding the loop...</div>';
+  const id=runId;
+  const a=sleep(2500);activeAnims.push(a);await a;
+  if(id!==runId)return;
+
+  appState = State.READY;
   render(model);$('run').disabled=false;$('code').textContent=gen(model);
   const steps=nodes.length;$('stats').innerHTML=`<b>${model.raw.length}</b> log lines became <b>${steps}</b> steps.<br>Loop of <b>${model.body.length}</b> steps, repeated <b>${model.k}</b> times.`;
   pick(model.pre.length)}
 
-const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+const sleep=ms=>{
+  let t;const p=new Promise(r=>t=setTimeout(r,ms));
+  p.cancel=()=>clearTimeout(t);return p};
 async function run(){
-  if(running)return;running=true;$('run').disabled=true;$('out').textContent='';
+  if(appState===State.RUNNING)return;
+  const id=++runId;appState=State.RUNNING;
+  $('run').disabled=true;$('out').textContent='';
   document.querySelectorAll('.node').forEach(e=>e.classList.remove('on','done'));
   const m=model,log=s=>{$('out').textContent+=s+'\n';$('out').scrollTop=1e9};
   const hit=(i,s)=>{document.querySelectorAll('.node').forEach(e=>e.classList.remove('on'));$('n'+i).classList.add('on','done');log('-> '+s)};
-  let i=0;for(const t of m.pre){hit(i++,t);await sleep(380)}
+  
+  let i=0;for(const t of m.pre){
+    if(id!==runId)return;hit(i++,t);
+    const a=sleep(380);activeAnims.push(a);await a}
   const f=i;
-  for(let r=0;r<m.k;r++){$('badge').textContent=`${r+1}/${m.k}`;
+  for(let r=0;r<m.k;r++){
+    if(id!==runId)return;
+    $('badge').textContent=`${r+1}/${m.k}`;
     if(r>0)document.querySelectorAll('.node').forEach((e,x)=>{if(x>=f&&x<f+m.body.length)e.classList.remove('done')});
-    for(let j=0;j<m.body.length;j++){hit(f+j,m.body[j].vals[r]);await sleep(200)}}
-  i=f+m.body.length;for(const t of m.post){hit(i++,t);await sleep(380)}
+    for(let j=0;j<m.body.length;j++){
+      if(id!==runId)return;hit(f+j,m.body[j].vals[r]);
+      const a=sleep(200);activeAnims.push(a);await a}}
+  
+  i=f+m.body.length;for(const t of m.post){
+    if(id!==runId)return;hit(i++,t);
+    const a=sleep(380);activeAnims.push(a);await a}
+  
   document.querySelectorAll('.node').forEach(e=>e.classList.remove('on'));
-  $('badge').textContent=`×${m.k}`;log('Done.');running=false;$('run').disabled=false}
+  $('badge').textContent=`×${m.k}`;log('Done.');
+  appState=State.DONE;$('run').disabled=false}
 
 $('mine').onclick=mine;$('run').onclick=run;
 const EMPTY='<p class="empty">Choose Find the loop to see the pattern.</p>';
 const currentDomain=()=>document.querySelector('input[name=domain]:checked').value;
 function reset(){
+  cleanup();
+  appState = State.IDLE;
   model=null;
+  $('log').style.display = 'block';
+  $('log-viewer').style.display = 'none';
   $('chart').innerHTML=EMPTY;$('code').textContent='';$('out').textContent='';
   $('stats').textContent='';$('inspect').innerHTML='';$('run').disabled=true}
 function loadDomain(){$('log').value=DOMAINS[currentDomain()];reset()}
 document.querySelectorAll('input[name=domain]').forEach(r=>r.onchange=loadDomain);
 $('load-sample').onclick=loadDomain;
+$('log').oninput=reset;
 $('clear-log').onclick=()=>{$('log').value='';reset()};
 loadDomain();
 $('copy').onclick=async()=>{try{await navigator.clipboard.writeText($('code').textContent);$('copy').textContent='Copied'}catch(e){$('copy').textContent='Copy failed'}setTimeout(()=>$('copy').textContent='Copy',1500)};
